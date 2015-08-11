@@ -1,6 +1,6 @@
 //AUDIO SETUP
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
+var controller;
 
 var oscillator = audioCtx.createOscillator();
 var gainNode = audioCtx.createGain();
@@ -10,10 +10,41 @@ oscillator.connect(gainNode);
 gainNode.connect(audioCtx.destination);
 gainNode.gain.value = 0;
 oscillator.type = "sine";
-oscillator.start();
+oscillator.start(0);
 
+//setupDirections();
 setupControls();
 setupVis();
+
+//adds in graphical directions for using the program
+function setupDirections() {
+  var svgContainer = d3.select(".directions").append("svg"),
+    svgWidth = parseInt(svgContainer.style("width")),
+    svgHeight = parseInt(svgContainer.style("height"));
+
+    d3.json("js/hands.json", function(data) {
+      console.log(data);
+
+      hands = svgContainer.selectAll("g")
+        .data(data)
+        .enter().append("g").append("path")
+        .attr({
+          "class": function(d) { return "hands " + d.hand; },
+          "d": function(d) { return d.d; }
+        });
+
+      var handWidth = hands[0][0].getBBox().width;
+      var handHeight = hands[0][0].getBBox().height;
+
+      hands.attr({
+        "transform": function(d) {
+          return d.hand == "left" ?
+          "translate(" + svgWidth + ",0)" :
+          "translate(" + (svgWidth - handWidth) + ",0)";
+        }
+      });
+    });
+}
 
 //CONTROLS SETUP
 function setupControls() {
@@ -110,7 +141,9 @@ function setupVis() {
     newZ = 0,
     oldZ = newZ;
 
-  var controller = Leap.loop({background: true}, function(frame) {
+  controller = new Leap.Controller();
+
+  controller.on("frame", function(frame) {
       audioData.getByteTimeDomainData(sourceData.wave);
       waveform.attr("d", drawWaveform(sourceData.wave));
 
@@ -142,5 +175,6 @@ function setupVis() {
         }
       });
     });
-    //console.log(controller);
+
+    controller.connect();
 }

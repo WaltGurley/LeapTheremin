@@ -19,7 +19,6 @@ svg {
   border-style: solid;
   border-color: #fff;
   border-top: none;
-  height:
 }
 
 .active {
@@ -41,4 +40,19 @@ svg {
   stroke: #1c7af6;
   stroke-width: 3;
   fill: none;
+}
+
+.directions {
+  position: absolute;
+  display: none;
+  width: 80vmin;
+  height: 80vmin;
+  top: calc(50vh - 40vmin);
+  left: calc(50vw - 40vmin);
+  background-color: inherit;
+}
+
+.hands {
+  stroke: #1c7af6;
+  stroke-width: 3;
 }
